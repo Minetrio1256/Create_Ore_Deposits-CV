@@ -1,3 +1,5 @@
 {
+  "block.create_ore_deposits.iron_ore_deposit_block": "Iron Ore Deposit",
+  "block.create_ore_deposits.deposit_tester_block": "Deposit Tester",
   "item.create_ore_deposits.test_item": "Test Item"
 }

@@ -1,6 +1,7 @@
 package com.createcivilization.create_ore_deposits;
 
 import com.createcivilization.create_ore_deposits.block.CODBlocks;
+import com.createcivilization.create_ore_deposits.block.entity.CODBlockEntities;
 import com.createcivilization.create_ore_deposits.item.CODItems;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -49,6 +50,7 @@ public class Create_ore_deposits {
 
         CODItems.register(modEventBus);
         CODBlocks.register(modEventBus);
+        CODBlockEntities.register(modEventBus);
 
 
         MinecraftForge.EVENT_BUS.register(this);
