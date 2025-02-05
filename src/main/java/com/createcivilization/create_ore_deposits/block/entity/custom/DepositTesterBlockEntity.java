@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -69,19 +70,24 @@ public class DepositTesterBlockEntity extends BlockEntity {
         visited.add(InitialPos);
 
         while(!queue.isEmpty()) {
-            BlockPos current = queue.poll();
-            if(current.distManhattan(InitialPos) > farthestBlock.distManhattan(InitialPos)) {
-                farthestBlock = current;
-            }
+            int size = queue.size();
+            BlockPos lastInLevel = null;
+            for(int i = 0; i < size; i++) {
+                BlockPos current = queue.poll();
+                lastInLevel = current;
 
-            for(BlockPos neighboor : getPositions(current)) {
-                if(!visited.contains(neighboor) && isBlockMatch(level, neighboor)) {
-                    queue.add(neighboor);
-                    visited.add(neighboor);
+                for(BlockPos neighbor : getPositions(current)){
+                    if(!visited.contains(neighbor) && isBlockMatch(level, neighbor)) {
+                        queue.add(neighbor);
+                        visited.add(neighbor);
+                    }
                 }
             }
-        }
 
+            if(lastInLevel != null) {
+                farthestBlock = lastInLevel;
+            }
+        }
         return farthestBlock;
     }
 
