@@ -32,33 +32,30 @@ public class DepositTesterBlockEntity extends BlockEntity {
                 BlockPos furthestBlock = findFurthestTarget(Level, below);
                 this.target = true;
                 this.targetPos = furthestBlock;
-                System.out.println("Furthest Target Block FOUND: " + furthestBlock);
             }
-
-
-
             if(target) {
                 if(!(serverLevel.getBlockState(below).getBlock() == CODBlocks.IRON_ORE_DEPOSIT_BLOCK.get())) {
                     this.target = false;
+                    this.breakingProgessMilestone = -1;
                     return;
                 }
 
-                System.out.println("Attempting To Fuck With Target Block");
                 var blockEntity = serverLevel.getBlockEntity(this.targetPos);
                 if(blockEntity instanceof BaseOreDepositBlockEntity BE) {
-                    if (breakingProgessMilestone == -1){
-                        breakingProgessMilestone = (double) BE.getResourceLevel() / 9;
+                    if (this.breakingProgessMilestone == -1){
+                        this.breakingProgessMilestone = (double) BE.getResourceLevel() / 9;
                     }
                     if(BE.getResourceLevel() == 0){
                         serverLevel.destroyBlock(this.targetPos, false);
+                        serverLevel.destroyBlockProgress(1, this.targetPos, 0);
+                        this.breakingProgessMilestone = -1;
                         target = false;
                     } else if(BE.getResourceLevel() > 0){
-                        serverLevel.destroyBlockProgress(1, this.targetPos, getBreakingProgress(breakingProgessMilestone, BE.getResourceLevel()));
+                        serverLevel.destroyBlockProgress(1, this.targetPos, getBreakingProgress(this.breakingProgessMilestone, BE.getResourceLevel()));
                         BE.setResourceLevel(BE.getResourceLevel() - 1);
                     }
                 }
             }
-
         }
     }
 
