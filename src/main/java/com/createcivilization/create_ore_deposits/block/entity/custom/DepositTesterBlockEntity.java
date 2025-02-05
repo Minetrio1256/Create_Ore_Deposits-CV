@@ -19,6 +19,8 @@ public class DepositTesterBlockEntity extends BlockEntity {
     private boolean target = false;
     private BlockPos targetPos = new BlockPos(0, 0, 0);
 
+    private double breakingProgessMilestone = -1;
+
     public DepositTesterBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(CODBlockEntities.DEPOSIT_TESTER_BLOCK_ENTITY.get(), pPos, pBlockState);
     }
@@ -40,26 +42,32 @@ public class DepositTesterBlockEntity extends BlockEntity {
                     this.target = false;
                     return;
                 }
+
                 System.out.println("Attempting To Fuck With Target Block");
                 var blockEntity = serverLevel.getBlockEntity(this.targetPos);
                 if(blockEntity instanceof BaseOreDepositBlockEntity BE) {
-                    System.out.println("Resource Level: "+ BE.getResourceLevel());
+                    if (breakingProgessMilestone == -1){
+                        breakingProgessMilestone = (double) BE.getResourceLevel() / 9;
+                    }
                     if(BE.getResourceLevel() == 0){
-                        level.setBlock(this.targetPos, Blocks.AIR.defaultBlockState(), 3);
+                        serverLevel.destroyBlock(this.targetPos, false);
                         target = false;
                     } else if(BE.getResourceLevel() > 0){
+                        serverLevel.destroyBlockProgress(1, this.targetPos, getBreakingProgress(breakingProgessMilestone, BE.getResourceLevel()));
                         BE.setResourceLevel(BE.getResourceLevel() - 1);
-                        System.out.println("Resource Level NEW: "+BE.getResourceLevel());
                     }
-
                 }
             }
 
         }
-
-
-
     }
+
+    public static int getBreakingProgress(double breakingProgessMilestone, int resourceLevel) {
+        double progressRatio = (double) resourceLevel / breakingProgessMilestone;
+        int progress = 9 - (int) Math.ceil(progressRatio);
+        return Math.min(9, Math.max(1, progress));
+    }
+
 
     public static BlockPos findFurthestTarget(Level level, BlockPos InitialPos) {
         Queue<BlockPos> queue = new LinkedList<>();
