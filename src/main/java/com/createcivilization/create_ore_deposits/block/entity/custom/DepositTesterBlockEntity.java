@@ -3,12 +3,10 @@ package com.createcivilization.create_ore_deposits.block.entity.custom;
 import com.createcivilization.create_ore_deposits.block.CODBlocks;
 import com.createcivilization.create_ore_deposits.block.entity.CODBlockEntities;
 import com.createcivilization.create_ore_deposits.block.entity.custom.base.BaseOreDepositBlockEntity;
-import com.lowdragmc.lowdraglib.syncdata.managed.IManagedVar;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -76,7 +74,7 @@ public class DepositTesterBlockEntity extends BlockEntity {
                 farthestBlock = current;
             }
 
-            for(BlockPos neighboor : getPostions(current)) {
+            for(BlockPos neighboor : getPositions(current)) {
                 if(!visited.contains(neighboor) && isBlockMatch(level, neighboor)) {
                     queue.add(neighboor);
                     visited.add(neighboor);
@@ -92,9 +90,21 @@ public class DepositTesterBlockEntity extends BlockEntity {
         return state.getBlock() == CODBlocks.IRON_ORE_DEPOSIT_BLOCK.get();
     }
 
-    private static List<BlockPos> getPostions(BlockPos pos){
+    private static List<BlockPos> getPositions(BlockPos pos){
+
+        BlockPos above = pos.above();
+        BlockPos below = pos.below();
+        BlockPos aboveNorth = above.north();
+        BlockPos aboveSouth = above.south();
+        BlockPos middleNorth = pos.north();
+        BlockPos middleSouth = pos.south();
+        BlockPos belowNorth = below.north();
+        BlockPos belowSouth = below.south();
+
         return Arrays.asList(
-                pos.north(), pos.east(), pos.south(), pos.west(), pos.above(), pos.below()
+                above, aboveNorth, aboveSouth, above.east(), above.west(),aboveNorth.east(), aboveNorth.west(), aboveSouth.east(),aboveSouth.west(),
+                pos.east(),pos.west(),middleSouth,middleNorth,middleNorth.east(),middleNorth.west(),middleSouth.east(),middleSouth.west(),
+                below, belowNorth, belowSouth, below.east(), below.west(), belowNorth.east(),belowNorth.west(),belowSouth.east(),belowSouth.west()
         );
     }
 
