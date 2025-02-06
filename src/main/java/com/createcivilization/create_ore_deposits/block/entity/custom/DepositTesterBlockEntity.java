@@ -3,9 +3,13 @@ package com.createcivilization.create_ore_deposits.block.entity.custom;
 import com.createcivilization.create_ore_deposits.block.CODBlocks;
 import com.createcivilization.create_ore_deposits.block.entity.CODBlockEntities;
 import com.createcivilization.create_ore_deposits.block.entity.custom.base.BaseOreDepositBlockEntity;
+import com.createcivilization.create_ore_deposits.util.CODTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -28,13 +32,13 @@ public class DepositTesterBlockEntity extends BlockEntity {
     public void tick(Level Level, BlockPos Pos, BlockState State) {
         if(level instanceof ServerLevel serverLevel) {
             BlockPos below = new BlockPos(Pos.getX(), Pos.getY() - 1, Pos.getZ());
-            if(!this.target && (serverLevel.getBlockState(below).getBlock() == CODBlocks.IRON_ORE_DEPOSIT_BLOCK.get())) {
+            if(!this.target && (serverLevel.getBlockState(below).is(CODTags.Blocks.ORE_DEPOSITS))) {
                 BlockPos furthestBlock = findFurthestTarget(Level, below);
                 this.target = true;
                 this.targetPos = furthestBlock;
             }
             if(target) {
-                if(!(serverLevel.getBlockState(below).getBlock() == CODBlocks.IRON_ORE_DEPOSIT_BLOCK.get())) {
+                if(!(serverLevel.getBlockState(below).is(CODTags.Blocks.ORE_DEPOSITS))) {
                     this.target = false;
                     this.breakingProgessMilestone = -1;
                     return;
@@ -48,15 +52,29 @@ public class DepositTesterBlockEntity extends BlockEntity {
                     if(BE.getResourceLevel() == 0){
                         serverLevel.destroyBlock(this.targetPos, false);
                         serverLevel.destroyBlockProgress(1, this.targetPos, 0);
+
                         this.breakingProgessMilestone = -1;
                         target = false;
                     } else if(BE.getResourceLevel() > 0){
                         serverLevel.destroyBlockProgress(1, this.targetPos, getBreakingProgress(this.breakingProgessMilestone, BE.getResourceLevel()));
-                        BE.setResourceLevel(BE.getResourceLevel() - 1);
+                        ItemEntity oreEntity = createItem(serverLevel, this.getBlockPos().above(), BE.getExtractionStack(1));
+                        serverLevel.addFreshEntity(oreEntity);
                     }
                 }
             }
         }
+    }
+
+    public static ItemEntity createItem(ServerLevel serverLevel, BlockPos pos, ItemStack stack) {
+        if (serverLevel == null) return null;
+
+        Random rand = new Random();
+
+        ItemEntity itemEntity = new ItemEntity(
+                serverLevel, pos.getX(), pos.getY(), pos.getZ(), stack
+        );
+        itemEntity.setDeltaMovement(rand.nextDouble(((3 - 0) + 1) + 1),2,rand.nextDouble(((3 - 0) + 1) + 1));
+        return itemEntity;
     }
 
     public static int getBreakingProgress(double breakingProgessMilestone, int resourceLevel) {
@@ -98,7 +116,7 @@ public class DepositTesterBlockEntity extends BlockEntity {
 
     private static boolean isBlockMatch(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        return state.getBlock() == CODBlocks.IRON_ORE_DEPOSIT_BLOCK.get();
+        return state.is(CODTags.Blocks.ORE_DEPOSITS);
     }
 
     private static List<BlockPos> getPositions(BlockPos pos){

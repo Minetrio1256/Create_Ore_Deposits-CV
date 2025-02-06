@@ -1,6 +1,6 @@
 package com.createcivilization.create_ore_deposits.block.entity;
 
-import com.createcivilization.create_ore_deposits.Create_ore_deposits;
+import com.createcivilization.create_ore_deposits.CreateOreDeposits;
 import com.createcivilization.create_ore_deposits.block.CODBlocks;
 import com.createcivilization.create_ore_deposits.block.entity.custom.DepositTesterBlockEntity;
 import com.createcivilization.create_ore_deposits.block.entity.custom.IronOreDepositBlockEntity;
@@ -13,7 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 public class CODBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
-            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Create_ore_deposits.MODID);
+            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, CreateOreDeposits.MODID);
 
     public static final RegistryObject<BlockEntityType<IronOreDepositBlockEntity>> IRON_ORE_DEPOSIT_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("iron_ore_deposit_block_entity", () ->

@@ -1,6 +1,6 @@
 package com.createcivilization.create_ore_deposits.block;
 
-import com.createcivilization.create_ore_deposits.Create_ore_deposits;
+import com.createcivilization.create_ore_deposits.CreateOreDeposits;
 import com.createcivilization.create_ore_deposits.block.custom.DepositTesterBlock;
 import com.createcivilization.create_ore_deposits.block.custom.IronOreDepositBlock;
 import com.createcivilization.create_ore_deposits.item.CODItems;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 public class CODBlocks {
 
     public static final DeferredRegister<Block> BLOCKS =
-            DeferredRegister.create(ForgeRegistries.BLOCKS, Create_ore_deposits.MODID);
+            DeferredRegister.create(ForgeRegistries.BLOCKS, CreateOreDeposits.MODID);
 
 
 
