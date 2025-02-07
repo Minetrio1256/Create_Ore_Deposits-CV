@@ -2,6 +2,7 @@ package com.createcivilization.create_ore_deposits.block.entity.custom.base;
 
 import com.createcivilization.create_ore_deposits.util.CODTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -10,6 +11,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.*;
 
 public abstract class BaseDrillBlockEntity extends BlockEntity {
+
+    public boolean target = false;
+    public BlockPos targetPos = new BlockPos(0, 0, 0);
+
+    public double breakingProgessMilestone = -1;
     public BaseDrillBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
@@ -30,7 +36,7 @@ public abstract class BaseDrillBlockEntity extends BlockEntity {
                 lastInLevel = current;
 
                 for(BlockPos neighbor : getPositions(current)){
-                    if(!visited.contains(neighbor) && isBlockDepositMatch(level, neighbor)) {
+                    if(!visited.contains(neighbor) && isBlockDeposit(level, neighbor)) {
                         queue.add(neighbor);
                         visited.add(neighbor);
                     }
@@ -62,9 +68,44 @@ public abstract class BaseDrillBlockEntity extends BlockEntity {
         );
     }
 
-    public static boolean isBlockDepositMatch(Level level, BlockPos pos) {
+    public static boolean isBlockDeposit(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         return state.is(CODTags.Blocks.ORE_DEPOSITS);
+    }
+
+    public static int getBreakingProgress(double breakingProgessMilestone, int resourceLevel) {
+        double progressRatio = (double) resourceLevel / breakingProgessMilestone;
+        int progress = 9 - (int) Math.ceil(progressRatio);
+        return Math.min(9, Math.max(1, progress));
+    }
+
+
+    public void setTargetPos(int[] targetPosArray) {
+        this.targetPos = new BlockPos(targetPosArray[0], targetPosArray[1], targetPosArray[2]);
+    }
+
+    public BlockPos getTargetPos() {
+        return targetPos;
+    }
+
+    public void setHasTarget(boolean hasTarget) {
+        this.target = hasTarget;
+    }
+
+    public boolean hasTarget() {
+        return target;
+    }
+
+    @Override
+    public void load(CompoundTag pTag) {
+        this.setHasTarget(pTag.getBoolean("HasTarget"));
+        this.setTargetPos(pTag.getIntArray("TargetPos"));
+    }
+
+    @Override
+    public void saveAdditional(CompoundTag pTag) {
+        pTag.putBoolean("HasTarget", this.hasTarget());
+        pTag.putIntArray("TargetPos", new int[]{this.getTargetPos().getX(), this.getTargetPos().getY(), this.getTargetPos().getZ()});
     }
 
 }
