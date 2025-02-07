@@ -12,10 +12,14 @@ import java.util.*;
 
 public abstract class BaseDrillBlockEntity extends BlockEntity {
 
+
+
+    public int resourcePullSpeed;
+    public double efficiency;
     public boolean target = false;
     public BlockPos targetPos = new BlockPos(0, 0, 0);
 
-    public double breakingProgessMilestone = -1;
+    public double breakingProgressMilestone = -1;
     public BaseDrillBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
@@ -94,6 +98,14 @@ public abstract class BaseDrillBlockEntity extends BlockEntity {
 
     public boolean hasTarget() {
         return target;
+    }
+
+    public void setResourcePullSpeed(int resourcePullSpeed) {
+        this.resourcePullSpeed = resourcePullSpeed;
+    }
+
+    public int getResourcePullSpeed() {
+        return resourcePullSpeed;
     }
 
     @Override

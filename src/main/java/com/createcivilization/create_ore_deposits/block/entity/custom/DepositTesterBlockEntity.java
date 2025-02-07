@@ -14,11 +14,19 @@ import java.util.*;
 
 public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
 
+
+
+
     public DepositTesterBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(CODBlockEntities.DEPOSIT_TESTER_BLOCK_ENTITY.get(), pPos, pBlockState);
     }
 
+
+    private int startTick = 0;
+
     public void tick(Level Level, BlockPos Pos, BlockState State) {
+        if (!(this.startTick%getResourcePullSpeed() == 0)) return;
+        this.startTick++;
         if(level instanceof ServerLevel serverLevel) {
             BlockPos below = new BlockPos(Pos.getX(), Pos.getY() - 1, Pos.getZ());
             if(!this.target && isBlockDeposit(serverLevel, below)) {
@@ -29,23 +37,23 @@ public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
             if(target) {
                 if(!(isBlockDeposit(serverLevel, below))) {
                     this.target = false;
-                    this.breakingProgessMilestone = -1;
+                    this.breakingProgressMilestone = -1;
                     return;
                 }
 
                 var blockEntity = serverLevel.getBlockEntity(this.targetPos);
                 if(blockEntity instanceof BaseOreDepositBlockEntity BE) {
-                    if (this.breakingProgessMilestone == -1){
-                        this.breakingProgessMilestone = (double) BE.getResourceLevel() / 9;
+                    if (this.breakingProgressMilestone == -1){
+                        this.breakingProgressMilestone = (double) BE.getResourceLevel() / 9;
                     }
                     if(BE.getResourceLevel() == 0){
                         serverLevel.destroyBlock(this.targetPos, false);
                         serverLevel.destroyBlockProgress(1, this.targetPos, 0);
 
-                        this.breakingProgessMilestone = -1;
+                        this.breakingProgressMilestone = -1;
                         target = false;
                     } else if(BE.getResourceLevel() > 0){
-                        serverLevel.destroyBlockProgress(1, this.targetPos, getBreakingProgress(this.breakingProgessMilestone, BE.getResourceLevel()));
+                        serverLevel.destroyBlockProgress(1, this.targetPos, getBreakingProgress(this.breakingProgressMilestone, BE.getResourceLevel()));
                         ItemEntity oreEntity = createItem(serverLevel, this.getBlockPos().above(), BE.getExtractionStack(1));
                         serverLevel.addFreshEntity(oreEntity);
                     }
