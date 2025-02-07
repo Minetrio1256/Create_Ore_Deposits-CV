@@ -2,6 +2,7 @@ package com.createcivilization.create_ore_deposits.block.entity.custom;
 
 import com.createcivilization.create_ore_deposits.block.CODBlocks;
 import com.createcivilization.create_ore_deposits.block.entity.CODBlockEntities;
+import com.createcivilization.create_ore_deposits.block.entity.custom.base.BaseDrillBlockEntity;
 import com.createcivilization.create_ore_deposits.block.entity.custom.base.BaseOreDepositBlockEntity;
 import com.createcivilization.create_ore_deposits.util.CODTags;
 import net.minecraft.core.BlockPos;
@@ -18,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
 
-public class DepositTesterBlockEntity extends BlockEntity {
+public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
 
     private boolean target = false;
     private BlockPos targetPos = new BlockPos(0, 0, 0);
@@ -32,13 +33,13 @@ public class DepositTesterBlockEntity extends BlockEntity {
     public void tick(Level Level, BlockPos Pos, BlockState State) {
         if(level instanceof ServerLevel serverLevel) {
             BlockPos below = new BlockPos(Pos.getX(), Pos.getY() - 1, Pos.getZ());
-            if(!this.target && (serverLevel.getBlockState(below).is(CODTags.Blocks.ORE_DEPOSITS))) {
+            if(!this.target && isBlockDepositMatch(serverLevel, below)) {
                 BlockPos furthestBlock = findFurthestTarget(Level, below);
                 this.target = true;
                 this.targetPos = furthestBlock;
             }
             if(target) {
-                if(!(serverLevel.getBlockState(below).is(CODTags.Blocks.ORE_DEPOSITS))) {
+                if(!(isBlockDepositMatch(serverLevel, below))) {
                     this.target = false;
                     this.breakingProgessMilestone = -1;
                     return;
@@ -81,60 +82,6 @@ public class DepositTesterBlockEntity extends BlockEntity {
         double progressRatio = (double) resourceLevel / breakingProgessMilestone;
         int progress = 9 - (int) Math.ceil(progressRatio);
         return Math.min(9, Math.max(1, progress));
-    }
-
-
-    public static BlockPos findFurthestTarget(Level level, BlockPos InitialPos) {
-        Queue<BlockPos> queue = new LinkedList<>();
-        Set<BlockPos> visited = new HashSet<>();
-        BlockPos farthestBlock = InitialPos;
-
-        queue.add(InitialPos);
-        visited.add(InitialPos);
-
-        while(!queue.isEmpty()) {
-            int size = queue.size();
-            BlockPos lastInLevel = null;
-            for(int i = 0; i < size; i++) {
-                BlockPos current = queue.poll();
-                lastInLevel = current;
-
-                for(BlockPos neighbor : getPositions(current)){
-                    if(!visited.contains(neighbor) && isBlockMatch(level, neighbor)) {
-                        queue.add(neighbor);
-                        visited.add(neighbor);
-                    }
-                }
-            }
-
-            if(lastInLevel != null) {
-                farthestBlock = lastInLevel;
-            }
-        }
-        return farthestBlock;
-    }
-
-    private static boolean isBlockMatch(Level level, BlockPos pos) {
-        BlockState state = level.getBlockState(pos);
-        return state.is(CODTags.Blocks.ORE_DEPOSITS);
-    }
-
-    private static List<BlockPos> getPositions(BlockPos pos){
-
-        BlockPos above = pos.above();
-        BlockPos below = pos.below();
-        BlockPos aboveNorth = above.north();
-        BlockPos aboveSouth = above.south();
-        BlockPos middleNorth = pos.north();
-        BlockPos middleSouth = pos.south();
-        BlockPos belowNorth = below.north();
-        BlockPos belowSouth = below.south();
-
-        return Arrays.asList(
-                above, aboveNorth, aboveSouth, above.east(), above.west(),aboveNorth.east(), aboveNorth.west(), aboveSouth.east(),aboveSouth.west(),
-                pos.east(),pos.west(),middleSouth,middleNorth,middleNorth.east(),middleNorth.west(),middleSouth.east(),middleSouth.west(),
-                below, belowNorth, belowSouth, below.east(), below.west(), belowNorth.east(),belowNorth.west(),belowSouth.east(),belowSouth.west()
-        );
     }
 
     public void setTargetPos(int[] targetPosArray) {
