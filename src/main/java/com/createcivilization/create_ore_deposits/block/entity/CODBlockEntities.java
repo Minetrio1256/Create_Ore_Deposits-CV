@@ -29,6 +29,14 @@ public class CODBlockEntities {
                     ).build(null)
             );
 
+    public static final RegistryObject<BlockEntityType<TestBlockEntity>> TEST_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("test_block_entity", () ->
+                    BlockEntityType.Builder.of(
+                            TestBlockEntity::new,
+                            CODBlocks.TEST_BLOCK.get()
+                    ).build(null)
+            );
+
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);
     }

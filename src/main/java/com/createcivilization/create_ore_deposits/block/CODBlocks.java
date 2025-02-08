@@ -25,11 +25,18 @@ public class CODBlocks {
             "deposit_tester_block", () -> new DepositTesterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK))
     );
 
+    public static RegistryObject<Block> TEST_BLOCK = registerBlock(
+            "test_block", () -> new TestBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK))
+    );
+
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn);
         return toReturn;
     }
+
+
+
 
     private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block) {
         CODItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
