@@ -23,7 +23,7 @@ public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
     public void tick(Level level, BlockPos pos, BlockState state) {
         this.setEfficiency(10); // Wait what but don't we need these values to be variable??
         this.setResourcePullSpeed(20);
-        if (this.startTick % getResourcePullSpeed() != 0) {
+        if (this.startTick % this.getResourcePullSpeed() != 0) {
             this.startTick++;
             return;
         }
