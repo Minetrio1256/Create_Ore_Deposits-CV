@@ -2,13 +2,11 @@ package com.createcivilization.create_ore_deposits.block.entity.custom.base;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class BaseOreDepositBlockEntity extends BlockEntity {
-
 
     private int resourceLevel = 200;
 
@@ -16,14 +14,24 @@ public abstract class BaseOreDepositBlockEntity extends BlockEntity {
         super(pType, pPos, pBlockState);
     }
 
-    public abstract ItemStack getExtractionStack(int amount);
+    public ItemStack getExtractionStack(int amount) {
+        if (this.getResourceLevel() < amount) amount = this.getResourceLevel();
+        this.setResourceLevel(this.getResourceLevel() - amount);
+        return this.getExtractionStack0(amount);
+    }
+
+    public ItemStack getExtractionStack0(int amount) {
+        return new ItemStack(this::getExtractionItem, amount);
+    }
+
+    public abstract Item getExtractionItem();
 
     public void setResourceLevel(int resourceLevel) {
         this.resourceLevel = resourceLevel;
     }
 
     public int getResourceLevel() {
-        return resourceLevel;
+        return this.resourceLevel;
     }
 
     @Override
