@@ -28,30 +28,27 @@ public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
             return;
         }
         this.startTick++;
+
         if (level instanceof ServerLevel serverLevel) {
             BlockPos below = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
             if (!this.hasTarget() && this.isBlockDeposit(serverLevel, below)) {
                 BlockPos furthestBlock = this.findFurthestTarget(level, below);
                 this.setHasTarget(true);
                 this.setTargetPos(furthestBlock);
+                this.setChanged(); //Mark the drill for saving
             }
-            if (this.hasTarget()) {
-                if(!this.isBlockDeposit(serverLevel, below)) {
-                    this.setHasTarget(false);
-                    this.setBreakingProgressMilestone(-1);
-                    return;
-                }
+            if (this.hasTarget() && !this.isBlockDeposit(serverLevel, this.getTargetPos())) {
+                this.setHasTarget(false);
+                this.setBreakingProgressMilestone(-1);
+                this.setChanged(); //Mark the drill for saving
+
+
+            } else if (this.hasTarget() && this.isBlockDeposit(serverLevel, this.getTargetPos())) {
 
                 var blockEntity = serverLevel.getBlockEntity(this.getTargetPos());
                 if (blockEntity instanceof BaseOreDepositBlockEntity BE) {
                     if (this.getBreakingProgressMilestone() == -1) this.setBreakingProgressMilestone((double) BE.getResourceLevel() / 9);
-                    if (BE.getResourceLevel() == 0) {
-                        serverLevel.destroyBlock(this.getTargetPos(), false);
-                        serverLevel.destroyBlockProgress(1, this.getTargetPos(), 0);
-
-                        this.setBreakingProgressMilestone(-1);
-                        this.setHasTarget(false);
-                    } else if (BE.getResourceLevel() > 0) {
+                    if (BE.getResourceLevel() > 0) {
                         serverLevel.destroyBlockProgress(
                                 1,
                                 this.getTargetPos(),
@@ -66,6 +63,15 @@ public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
                                 BE.getExtractionStack(this.getEfficiency())
                         );
                         serverLevel.addFreshEntity(oreEntity);
+                        BE.setChanged(); // Mark BE to be saved
+                    }
+                    if (BE.getResourceLevel() == 0) {
+                        serverLevel.destroyBlock(this.getTargetPos(), false);
+                        serverLevel.destroyBlockProgress(1, this.getTargetPos(), 0);
+
+                        this.setBreakingProgressMilestone(-1);
+                        this.setHasTarget(false);
+                        this.setChanged(); //Mark the drill for saving
                     }
                 }
             }
@@ -78,7 +84,15 @@ public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
         Random rand = new Random();
         ItemEntity itemEntity = new ItemEntity(serverLevel, pos.getX(), pos.getY(), pos.getZ(), stack);
         // Why the hell was there pointless maths here??
-        itemEntity.setDeltaMovement(rand.nextDouble(5), 2, rand.nextDouble(5));
+
+        double minVelocity = -0.5;
+        double maxVelocity = 0.6;
+
+        double randomX = minVelocity + (rand.nextDouble() * (maxVelocity - minVelocity));
+        double randomZ = minVelocity + (rand.nextDouble() * (maxVelocity - minVelocity));
+
+
+        itemEntity.setDeltaMovement(randomX, .5, randomZ);
         return itemEntity;
     }
 }

@@ -34,6 +34,7 @@ public abstract class BaseOreDepositBlockEntity extends BlockEntity {
         return this.resourceLevel;
     }
 
+
     @Override
     public void load(CompoundTag pTag) {
         this.setResourceLevel(pTag.getInt("ResourceLevel"));
