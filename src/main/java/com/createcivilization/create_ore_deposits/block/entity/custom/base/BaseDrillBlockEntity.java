@@ -15,7 +15,7 @@ public abstract class BaseDrillBlockEntity extends BlockEntity {
 
 
     public int resourcePullSpeed;
-    public double efficiency;
+    public int efficiency;
     public boolean target = false;
     public BlockPos targetPos = new BlockPos(0, 0, 0);
 
@@ -106,6 +106,14 @@ public abstract class BaseDrillBlockEntity extends BlockEntity {
 
     public int getResourcePullSpeed() {
         return resourcePullSpeed;
+    }
+
+    public void setEfficiency(int efficiency) {
+        this.efficiency = efficiency;
+    }
+
+    public int getEfficiency() {
+        return efficiency;
     }
 
     @Override

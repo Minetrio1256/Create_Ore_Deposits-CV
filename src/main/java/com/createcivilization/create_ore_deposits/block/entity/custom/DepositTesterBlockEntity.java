@@ -22,10 +22,15 @@ public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
     }
 
 
-    private int startTick = 0;
+    private int startTick = 1;
 
     public void tick(Level Level, BlockPos Pos, BlockState State) {
-        if (!(this.startTick%getResourcePullSpeed() == 0)) return;
+        setEfficiency(10);
+        setResourcePullSpeed(20);
+        if (!(this.startTick%getResourcePullSpeed() == 0)){
+            this.startTick++;
+            return;
+        }
         this.startTick++;
         if(level instanceof ServerLevel serverLevel) {
             BlockPos below = new BlockPos(Pos.getX(), Pos.getY() - 1, Pos.getZ());
@@ -54,7 +59,7 @@ public class DepositTesterBlockEntity extends BaseDrillBlockEntity {
                         target = false;
                     } else if(BE.getResourceLevel() > 0){
                         serverLevel.destroyBlockProgress(1, this.targetPos, getBreakingProgress(this.breakingProgressMilestone, BE.getResourceLevel()));
-                        ItemEntity oreEntity = createItem(serverLevel, this.getBlockPos().above(), BE.getExtractionStack(1));
+                        ItemEntity oreEntity = createItem(serverLevel, this.getBlockPos().above(), BE.getExtractionStack(getEfficiency()));
                         serverLevel.addFreshEntity(oreEntity);
                     }
                 }
