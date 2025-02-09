@@ -12,6 +12,10 @@ public class CODTags {
 
         public static final TagKey<Block> ORE_DEPOSITS = registerTag("ore_deposits");
 
+        //Remove This Please
+
+        public static final TagKey<Block> EVERYTHING = registerTag("everything");
+
         public static TagKey<Block> registerTag(String name) {
             return BlockTags.create(new ResourceLocation(CreateOreDeposits.MOD_ID, name));
         }

@@ -17,4 +17,5 @@ public class IronOreDepositBlockEntity extends BaseOreDepositBlockEntity {
     public Item getExtractionItem() {
         return Items.RAW_IRON;
     }
+
 }

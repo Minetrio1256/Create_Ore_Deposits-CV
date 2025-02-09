@@ -24,6 +24,7 @@ public class DataGenerators {
 
         generator.addProvider(event.includeServer(), new CODBlockTagGenerator(packOutput, lookupProvider, existingFileHelper));
         generator.addProvider(event.includeClient(), new CODBlockStateProvider(packOutput, existingFileHelper));
+        generator.addProvider(event.includeServer(), new CODWorldGenProvider(packOutput, lookupProvider));
 
 
     }
