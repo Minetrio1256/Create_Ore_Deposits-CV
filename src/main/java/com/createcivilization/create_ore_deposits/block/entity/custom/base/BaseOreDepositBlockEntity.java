@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class BaseOreDepositBlockEntity extends BlockEntity {
 
-    private int resourceLevel = 200;
+    private int resourceLevel;
 
     public BaseOreDepositBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);

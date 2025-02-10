@@ -2,8 +2,8 @@
   "feature": "create_ore_deposits:iron_ore_deposit_block",
   "placement": [
     {
-      "type": "minecraft:rarity_filter",
-      "chance": 90
+      "type": "minecraft:count",
+      "count": 3
     },
     {
       "type": "minecraft:in_square"
@@ -13,7 +13,7 @@
       "height": {
         "type": "minecraft:uniform",
         "max_inclusive": {
-          "absolute": 80
+          "absolute": 320
         },
         "min_inclusive": {
           "absolute": -64

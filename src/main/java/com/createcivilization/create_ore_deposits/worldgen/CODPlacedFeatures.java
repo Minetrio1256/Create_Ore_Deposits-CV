@@ -26,7 +26,7 @@ public class CODPlacedFeatures {
         HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
 
         register(context, IRON_DEPOSIT_PLACED_KEY, configuredFeatures.getOrThrow(CODConfiguredFeatures.OVERWORLD_IRON_DEPOSIT_KEY),
-                CODOrePlacement.commonOrePlacement(300,
+                CODOrePlacement.commonOrePlacement(3,
                         HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(320))));
     }
 
