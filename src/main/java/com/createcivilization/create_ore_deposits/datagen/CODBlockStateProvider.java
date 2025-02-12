@@ -16,7 +16,7 @@ public class CODBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        blockWithItem(CODBlocks.DEPOSIT_TESTER_BLOCK);
+        blockWithItem(CODBlocks.DRILL_BLOCK);
         blockWithItem(CODBlocks.IRON_ORE_DEPOSIT_BLOCK);
     }
 

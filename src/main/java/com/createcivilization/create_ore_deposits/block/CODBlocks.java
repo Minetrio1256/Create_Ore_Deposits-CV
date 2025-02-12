@@ -21,9 +21,9 @@ public class CODBlocks {
             "iron_ore_deposit_block", () -> new IronOreDepositBlock(BlockBehaviour.Properties.copy(Blocks.IRON_ORE))
     );
 
-    public static RegistryObject<Block> DEPOSIT_TESTER_BLOCK = registerBlock(
-            "deposit_tester_block", () -> new DepositTesterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK))
-    );
+    public static RegistryObject<Block> DRILL_BLOCK = registerBlock(
+            "deposit_tester_block", () -> new DrillBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK))
+    ); //TODO: Figure out a name for the drill
 
     public static RegistryObject<Block> TEST_BLOCK = registerBlock(
             "test_block", () -> new TestBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK))

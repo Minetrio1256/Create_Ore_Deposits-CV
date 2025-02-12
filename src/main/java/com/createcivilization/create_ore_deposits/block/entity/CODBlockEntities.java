@@ -21,11 +21,11 @@ public class CODBlockEntities {
                     ).build(null)
             );
 
-    public static final RegistryObject<BlockEntityType<DepositTesterBlockEntity>> DEPOSIT_TESTER_BLOCK_ENTITY =
+    public static final RegistryObject<BlockEntityType<DrillBlockEntity>> DEPOSIT_TESTER_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("deposit_tester_block_entity", () ->
                     BlockEntityType.Builder.of(
-                            DepositTesterBlockEntity::new,
-                            CODBlocks.DEPOSIT_TESTER_BLOCK.get()
+                            DrillBlockEntity::new,
+                            CODBlocks.DRILL_BLOCK.get()
                     ).build(null)
             );
 
