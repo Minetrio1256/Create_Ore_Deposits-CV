@@ -1,6 +1,6 @@
 package com.createcivilization.create_ore_deposits.block.entity.custom.base;
 
-import com.createcivilization.create_ore_deposits.tag.CODTags;
+import com.createcivilization.create_ore_deposits.block.custom.gen.BaseGeneratedDepositOre;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -100,7 +100,7 @@ public abstract class BaseDrillBlockEntity extends KineticBlockEntity {
 
     public boolean isBlockDeposit(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        return state.is(CODTags.Blocks.ORE_DEPOSITS);
+        return state.getOptionalValue(BaseGeneratedDepositOre.RESOURCE_VALUE).isPresent();
     }
 
     public int getBreakingProgress(double breakingProgressMilestone, int resourceLevel) {

@@ -1,5 +1,7 @@
 package com.createcivilization.create_ore_deposits.block.entity.custom;
 
+import com.createcivilization.create_ore_deposits.CreateOreDeposits;
+import com.createcivilization.create_ore_deposits.block.custom.gen.BaseGeneratedDepositOre;
 import com.createcivilization.create_ore_deposits.block.entity.CODBlockEntities;
 import com.createcivilization.create_ore_deposits.block.entity.custom.base.*;
 
@@ -7,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class DrillBlockEntity extends BaseDrillBlockEntity {
 
@@ -50,28 +53,32 @@ public class DrillBlockEntity extends BaseDrillBlockEntity {
             this.setBreakingProgressMilestone(-1);
             this.setChanged(); //Mark the drill for saving
         } else if (this.hasTarget() && this.isBlockDeposit(serverLevel, this.getTargetPos())) {
-            if (!(serverLevel.getBlockEntity(this.getTargetPos()) instanceof BaseOreDepositBlockEntity BE)) return;
-            ItemStack extractedItem = BE.getExtractionStack(efficiency);
+
+            BlockState targetBlockState = level.getBlockState(this.getTargetPos());
+            BaseGeneratedDepositOre ore = (BaseGeneratedDepositOre) targetBlockState.getBlock();
+
+            int efficiency = this.getEfficiency();
+            int realEfficiency = Math.min(count + efficiency, maxStackSize);
+            ItemStack extractedItem = ore.extractItemStack(serverLevel, realEfficiency);
+            int resourceValue = targetBlockState.getValue(BaseGeneratedDepositOre.RESOURCE_VALUE);
             if (!slot.isEmpty() && !slot.getItem().equals(extractedItem.getItem())) return;
-            if (this.getBreakingProgressMilestone() == -1) this.setBreakingProgressMilestone((double) BE.getResourceLevel() / 9);
-            if (BE.getResourceLevel() > 0) {
+            if (this.getBreakingProgressMilestone() == -1) this.setBreakingProgressMilestone((double) resourceValue / 9);
+            if (resourceValue > 0) {
                 serverLevel.destroyBlockProgress(
                         1,
                         this.getTargetPos(),
                         this.getBreakingProgress(
                                 this.getBreakingProgressMilestone(),
-                                BE.getResourceLevel()
+                                resourceValue
                         )
                 );
-                if (slot.isEmpty()) {
-                    inventory.setStackInSlot(0, extractedItem);
-                } else {
-                    slot.setCount(Math.min(count + this.getEfficiency(), maxStackSize));
-                    inventory.setStackInSlot(0, slot);
-                }
-                BE.setChanged(); // Mark BE to be saved
+
+                inventory.setStackInSlot(0, extractedItem);
+                BlockState newState = targetBlockState.setValue(BaseGeneratedDepositOre.RESOURCE_VALUE, Math.max(0, resourceValue - efficiency));
+                serverLevel.setBlock(this.getTargetPos(), newState, 3);
             }
-            if (BE.getResourceLevel() == 0) {
+
+            if (resourceValue == 0) {
                 serverLevel.destroyBlock(this.getTargetPos(), false);
                 serverLevel.destroyBlockProgress(1, this.getTargetPos(), 0);
 

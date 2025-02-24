@@ -13,14 +13,6 @@ public class CODBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, CreateOreDeposits.MOD_ID);
 
-    public static final RegistryObject<BlockEntityType<IronOreDepositBlockEntity>> IRON_ORE_DEPOSIT_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("iron_ore_deposit_block_entity", () ->
-                    BlockEntityType.Builder.of(
-                            IronOreDepositBlockEntity::new,
-                            CODBlocks.IRON_ORE_DEPOSIT_BLOCK.get()
-                    ).build(null)
-            );
-
     public static final RegistryObject<BlockEntityType<DrillBlockEntity>> DEPOSIT_TESTER_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("deposit_tester_block_entity", () ->
                     BlockEntityType.Builder.of(
