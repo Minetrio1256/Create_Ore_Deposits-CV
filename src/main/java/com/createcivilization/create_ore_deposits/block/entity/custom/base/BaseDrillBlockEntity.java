@@ -6,6 +6,8 @@ import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,25 +21,89 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public abstract class BaseDrillBlockEntity extends KineticBlockEntity {
+    //TODO:: make kinetic block entity vertical-only cause this is going to be a sort of pulley
 
     protected int resourcePullSpeed;
     protected int efficiency;
     protected boolean target = false;
     protected BlockPos targetPos = new BlockPos(0, 0, 0);
+    private int startTick = 1;
 
     protected final ItemStackHandler inventory = new ItemStackHandler(1);
     // If for whatever reason the size should be unique, just remove the "1" and make them do .setSize for each instance
 
     protected double breakingProgressMilestone = -1;
-
-    public abstract void onTick();
+    //TODO -> Make varying speeds affect the drill (ASK ARTY ON THE MATHS FOR THAT)
 
     public void tick() {
         super.tick();
         assert this.level != null;
         if (this.level.isClientSide()) return;
         if (this.getSpeed() == 0.0F) return;
-        onTick();
+        ServerLevel serverLevel = (ServerLevel) this.level;
+        assert serverLevel != null;
+        BlockPos pos = this.getBlockPos();
+        if (this.startTick % this.getResourcePullSpeed() != 0) {
+            this.startTick++;
+            return;
+        }
+        this.startTick++;
+
+        //Add slot logic if we ever decide we need more than one slot for inventory, you can ask Orion to do this if you want
+        ItemStack slot = this.inventory.getStackInSlot(0);
+
+        int maxStackSize = slot.getMaxStackSize();
+        int count = slot.getCount();
+        if (count >= maxStackSize) return;
+
+        BlockPos below = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
+
+        if (!this.hasTarget() && this.isBlockDeposit(serverLevel, below)) {
+            BlockPos furthestBlock = this.findFurthestTarget(serverLevel, below);
+            this.setHasTarget(true);
+            this.setTargetPos(furthestBlock);
+            this.setChanged(); //Mark the drill for saving
+        }
+
+        if (this.hasTarget() && !this.isBlockDeposit(serverLevel, this.getTargetPos())) {
+            this.setHasTarget(false);
+            this.setBreakingProgressMilestone(-1);
+            this.setChanged(); //Mark the drill for saving
+        } else if (this.hasTarget() && this.isBlockDeposit(serverLevel, this.getTargetPos())) {
+
+            BlockState targetBlockState = level.getBlockState(this.getTargetPos());
+            BaseGeneratedDepositOre ore = (BaseGeneratedDepositOre) targetBlockState.getBlock();
+
+            int efficiency = this.getEfficiency();
+            int realEfficiency = Math.min(count + efficiency, maxStackSize);
+            ItemStack extractedItem = ore.extractItemStack(serverLevel, realEfficiency);
+            int resourceValue = targetBlockState.getValue(BaseGeneratedDepositOre.RESOURCE_VALUE);
+            if (!slot.isEmpty() && !slot.getItem().equals(extractedItem.getItem())) return;
+            if (this.getBreakingProgressMilestone() == -1) this.setBreakingProgressMilestone((double) resourceValue / 9);
+            if (resourceValue > 0) {
+                serverLevel.destroyBlockProgress(
+                        1,
+                        this.getTargetPos(),
+                        this.getBreakingProgress(
+                                this.getBreakingProgressMilestone(),
+                                resourceValue
+                        )
+                );
+
+                inventory.setStackInSlot(0, extractedItem);
+                BlockState newState = targetBlockState.setValue(BaseGeneratedDepositOre.RESOURCE_VALUE, Math.max(0, resourceValue - efficiency));
+                serverLevel.setBlock(this.getTargetPos(), newState, 3);
+            }
+
+            if (resourceValue == 0) {
+                serverLevel.destroyBlock(this.getTargetPos(), false);
+                serverLevel.destroyBlockProgress(1, this.getTargetPos(), 0);
+
+                this.setBreakingProgressMilestone(-1);
+                this.setHasTarget(false);
+                this.setChanged(); //Mark the drill for saving
+            }
+        }
     }
 
     public double getBreakingProgressMilestone() {
