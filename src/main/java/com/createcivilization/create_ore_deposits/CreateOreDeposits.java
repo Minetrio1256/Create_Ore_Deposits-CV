@@ -6,7 +6,10 @@ import com.createcivilization.create_ore_deposits.item.CODItems;
 
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
 @Mod(CreateOreDeposits.MOD_ID)
@@ -15,14 +18,15 @@ public class CreateOreDeposits {
     public static final String MOD_ID = "create_ore_deposits";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    @SuppressWarnings("removal") // Forge 47.3.10 makes breaking changes but older versions are shipped to users by default
-    public CreateOreDeposits() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public CreateOreDeposits(IEventBus modEventBus, ModContainer modContainer) {
 
         CODItems.register(modEventBus);
         CODBlocks.register(modEventBus);
         CODBlockEntities.register(modEventBus);
-
-        MinecraftForge.EVENT_BUS.register(this);
+        // Register ourselves for server and other game events we are interested in.
+        // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
+        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
+        NeoForge.EVENT_BUS.register(this);
     }
+
 }
